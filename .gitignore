@@ -1,0 +1,99 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Data directories (keep structure but ignore content)
+data/resumes/*
+!data/resumes/.gitkeep
+data/jds/*
+!data/jds/.gitkeep
+data/extracted_texts/*
+!data/extracted_texts/.gitkeep
+data/results/*
+!data/results/.gitkeep
+
+# Model cache
+data/embeddings_cache/
+*.pkl
+*.pickle
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Streamlit
+.streamlit/
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# API keys and secrets
+secrets.toml
+.secrets/
+
+# Large files
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Test outputs
+test_outputs/
+eval_results/
+.cursor_tasks.json
+env_template.txt
+setup_api.py
+test_installation.py
