@@ -49,7 +49,7 @@ class EmbeddingManager:
                 logger.info(f"Loading sentence transformer model: {self.model_name}")
                 # Set Hugging Face access token
                 import os
-                os.environ['HF_TOKEN'] = os.getenv('HF_TOKEN')
+                # os.environ['HF_TOKEN'] = os.getenv('HF_TOKEN')
                 self.model = SentenceTransformer(self.model_name, use_auth_token=True)
                 logger.info("Sentence transformer model loaded successfully")
                 return
