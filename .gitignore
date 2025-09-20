@@ -94,3 +94,6 @@ secrets.toml
 test_outputs/
 eval_results/
 .cursor_tasks.json
+env_template.txt
+setup_api.py
+test_installation.py
