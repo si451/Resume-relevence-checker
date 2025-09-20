@@ -16,7 +16,6 @@ A Streamlit-based web application that analyzes resume relevance against job des
 
 ```
 ResumeAI/
-├── .cursor_tasks.json          # Task management file
 ├── .env                        # Environment variables (create from .env.example)
 ├── streamlit_app.py            # Main Streamlit application
 ├── requirements.txt            # Python dependencies
