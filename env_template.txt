@@ -1,9 +1,0 @@
-# Grok API Configuration
-# Copy this file to .env and fill in your actual API credentials
-GROK_API_URL=https://api.groq.com/openai/v1
-GROK_API_KEY=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
-
-# Optional: Override default settings
-# HARD_WEIGHT=0.6
-# SOFT_WEIGHT=0.4
-# EMBEDDING_MODEL=all-MiniLM-L6-v2
