@@ -31,11 +31,11 @@ HEADERS = {
 class GrokClient:
     """Client for interacting with Grok API."""
     
-    def __init__(self, api_url: str = None, api_key: str = None):
+    def __init__(self, api_url: Optional[str] = None, api_key: Optional[str] = None):
         self.api_url = api_url or GROK_API_URL
         self.api_key = api_key or GROK_API_KEY
         self.headers = {
-            "Authorization": f"Bearer {self.api_key}",
+            "Authorization": f"Bearer {self.api_key}" if self.api_key else "",
             "Content-Type": "application/json"
         }
         
@@ -55,10 +55,15 @@ class GrokClient:
     
     def _make_request(self, endpoint: str, payload: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
         """Make API request with retry logic."""
-        url = f"{self.api_url.rstrip('/')}/{endpoint.lstrip('/')}"
+        base = (self.api_url or GROK_API_URL or "").rstrip('/')
+        endpoint_part = (endpoint or "").lstrip('/')
+        if base:
+            url = f"{base}/{endpoint_part}" if endpoint_part else base
+        else:
+            url = endpoint_part or ""
         
         # Log the request
-        print(f"\n🚀 Groq API Request to {endpoint}:")
+        print(f"\n🚀 Groq API Request to {url or endpoint}:")
         print(f"📤 Payload: {json.dumps(payload, indent=2)}")
         
         for attempt in range(max_retries):
@@ -118,7 +123,7 @@ class GrokClient:
         return {"ok": False, "error": "Max retries exceeded", "raw": {}}
     
     def generate(self, prompt: str, model: str = "grok-1", max_tokens: int = 256, 
-                temperature: float = 0.2, system_prompt: str = None) -> Dict[str, Any]:
+                temperature: float = 0.2, system_prompt: Optional[str] = None) -> Dict[str, Any]:
         """
         Generate text using Grok API.
         
@@ -174,7 +179,7 @@ class GrokClient:
 
     def generate_with_online_context(self, prompt: str, urls: Optional[List[str]] = None, 
                                      model: str = "grok-1", max_tokens: int = 256,
-                                     temperature: float = 0.2, system_prompt: str = None) -> Dict[str, Any]:
+                                     temperature: float = 0.2, system_prompt: Optional[str] = None) -> Dict[str, Any]:
         """Augment the prompt with online content fetched from `urls` (if provided)
 
         The function will try to fetch and summarize the URLs using `internet_tools`.
@@ -257,7 +262,7 @@ def get_client() -> GrokClient:
 
 # Convenience functions
 def grok_generate(prompt: str, model: str = "grok-1", max_tokens: int = 256, 
-                 temperature: float = 0.2, system_prompt: str = None) -> Dict[str, Any]:
+                 temperature: float = 0.2, system_prompt: Optional[str] = None) -> Dict[str, Any]:
     """Convenience function for text generation."""
     client = get_client()
     return client.generate(prompt, model, max_tokens, temperature, system_prompt)

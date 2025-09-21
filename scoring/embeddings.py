@@ -131,7 +131,8 @@ class EmbeddingManager:
             
             # Fit on the text itself (not ideal but works as fallback)
             tfidf_matrix = vectorizer.fit_transform([text])
-            embedding = tfidf_matrix.toarray()[0]
+            # Convert sparse matrix to a dense 1-D numpy array in a way that static analyzers recognize
+            embedding = np.asarray(tfidf_matrix.todense()).ravel()
             
             # Normalize the vector
             embedding = normalize([embedding])[0]

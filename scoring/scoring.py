@@ -279,7 +279,7 @@ class ResumeScorer:
         
         for resume_data in resumes_data:
             resume_text = resume_data.get("text", "")
-            resume_file = resume_data.get("filename", "unknown")
+            resume_file = resume_data.get("resume_file", "unknown")
             # Ensure must_have_skills is always a list
             safe_must_have_skills = must_have_skills if must_have_skills is not None else []
             if not resume_text:

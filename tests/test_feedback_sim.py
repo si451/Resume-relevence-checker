@@ -39,7 +39,9 @@ _p("Running FeedbackGenerator")
 # Use LLM if available (requires GROK_API_KEY in env), otherwise use template fallback
 fg = FeedbackGenerator(use_llm=bool(os.getenv('GROK_API_KEY')))
 
-res = fg.generate_batch_feedback([resume], jd_text, urls=urls if summary else None)
+# generate_batch_feedback expects only (resumes, jd_text) as positional args,
+# so avoid passing a third positional argument here.
+res = fg.generate_batch_feedback([resume], jd_text)
 print(json.dumps(res, indent=2, ensure_ascii=False))
 
 _p("Test complete")
