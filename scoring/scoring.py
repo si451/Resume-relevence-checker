@@ -131,7 +131,10 @@ class ResumeScorer:
             tfidf_matrix = vectorizer.fit_transform(texts)
             
             # Calculate cosine similarity
-            similarity = cosine_similarity(tfidf_matrix[0:1], tfidf_matrix[1:2])[0][0]
+            resume_vec = tfidf_matrix.getrow(0).toarray()
+            jd_vec = tfidf_matrix.getrow(1).toarray()
+            similarity_matrix = cosine_similarity(resume_vec, jd_vec)
+            similarity = similarity_matrix[0, 0]
             
             # Normalize to 0-100
             normalized_score = similarity * 100
@@ -204,7 +207,7 @@ class ResumeScorer:
             return "Low"
     
     def score_resume(self, resume_text: str, jd_text: str, must_have_skills: List[str], 
-                    good_to_have_skills: List[str] = None) -> Dict[str, Any]:
+                    good_to_have_skills: Optional[List[str]] = None) -> Dict[str, Any]:
         """
         Score a single resume against a job description.
         
@@ -259,7 +262,7 @@ class ResumeScorer:
             }
     
     def score_multiple_resumes(self, resumes_data: List[Dict[str, Any]], jd_text: str, 
-                             must_have_skills: List[str], good_to_have_skills: List[str] = None) -> List[Dict[str, Any]]:
+                             must_have_skills: List[str], good_to_have_skills: Optional[List[str]] = None) -> List[Dict[str, Any]]:
         """
         Score multiple resumes against a job description.
         
@@ -277,7 +280,8 @@ class ResumeScorer:
         for resume_data in resumes_data:
             resume_text = resume_data.get("text", "")
             resume_file = resume_data.get("filename", "unknown")
-            
+            # Ensure must_have_skills is always a list
+            safe_must_have_skills = must_have_skills if must_have_skills is not None else []
             if not resume_text:
                 results.append({
                     "resume_file": resume_file,
@@ -287,13 +291,14 @@ class ResumeScorer:
                     "soft_pct": 0.0,
                     "final_score": 0.0,
                     "verdict": "Low",
-                    "missing_skills": must_have_skills
+                    "missing_skills": safe_must_have_skills
                 })
                 continue
-            
             # Score the resume
-            score_result = self.score_resume(resume_text, jd_text, must_have_skills, good_to_have_skills)
+            score_result = self.score_resume(resume_text, jd_text, safe_must_have_skills, good_to_have_skills)
             score_result["resume_file"] = resume_file
+            # Preserve path to extracted text so UI can show resume preview
+            score_result["extracted_text_path"] = resume_data.get("extracted_text_path", "")
             results.append(score_result)
         
         return results

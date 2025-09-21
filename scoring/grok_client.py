@@ -10,6 +10,7 @@ import json
 import logging
 from typing import Dict, List, Any, Optional
 from dotenv import load_dotenv
+from . import internet_tools
 
 # Load environment variables
 load_dotenv()
@@ -18,8 +19,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # API Configuration
-GROK_API_URL = os.getenv("GROK_API_URL")
-GROK_API_KEY = os.getenv("GROK_API_KEY")
+GROK_API_URL = os.getenv("GROK_API_URL") or ""
+GROK_API_KEY = os.getenv("GROK_API_KEY") or ""
 
 # Headers for API requests
 HEADERS = {
@@ -31,8 +32,8 @@ class GrokClient:
     """Client for interacting with Grok API."""
     
     def __init__(self, api_url: str = None, api_key: str = None):
-        self.api_url = api_url or GROK_API_URL
-        self.api_key = api_key or GROK_API_KEY
+    self.api_url = api_url if api_url is not None else GROK_API_URL
+    self.api_key = api_key if api_key is not None else GROK_API_KEY
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -54,7 +55,7 @@ class GrokClient:
     
     def _make_request(self, endpoint: str, payload: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
         """Make API request with retry logic."""
-        url = f"{self.api_url.rstrip('/')}/{endpoint.lstrip('/')}"
+    url = f"{(self.api_url or '').rstrip('/')}/{endpoint.lstrip('/')}"
         
         # Log the request
         print(f"\n🚀 Groq API Request to {endpoint}:")
@@ -170,6 +171,27 @@ class GrokClient:
                 response["text"] = response["text"]
         
         return response
+
+    def generate_with_online_context(self, prompt: str, urls: Optional[List[str]] = None, 
+                                     model: str = "grok-1", max_tokens: int = 256,
+                                     temperature: float = 0.2, system_prompt: str = None) -> Dict[str, Any]:
+        """Augment the prompt with online content fetched from `urls` (if provided)
+
+        The function will try to fetch and summarize the URLs using `internet_tools`.
+        If fetching fails or no URLs are provided, it falls back to a normal generate().
+        """
+        augmented_prompt = prompt
+        try:
+            if urls:
+                online_summary = internet_tools.fetch_and_summarize(urls)
+                if online_summary:
+                    augmented_prompt = f"OnlineContext:\n{online_summary}\n\nUserPrompt:\n{prompt}"
+        except Exception:
+            # any failure should not block generation — fall back
+            augmented_prompt = prompt
+
+        return self.generate(augmented_prompt, model=model, max_tokens=max_tokens, 
+                             temperature=temperature, system_prompt=system_prompt)
     
     def embeddings(self, texts: List[str], model: str = "text-embedding-3-small") -> Dict[str, Any]:
         """

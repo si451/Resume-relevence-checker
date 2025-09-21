@@ -9,9 +9,7 @@ A Streamlit-based web application that analyzes resume relevance against job des
 - **Hybrid Scoring**: Combines keyword matching (hard) and semantic similarity (soft) scoring
 - **AI Feedback**: Generate personalized improvement suggestions using Grok API
 - **Interactive UI**: User-friendly Streamlit interface with real-time analysis
-- **Export Results**: Save results as CSV or JSON files
-- **Task Management**: Built-in task tracking and progress monitoring
-
+- **Export Results**: Save results as PDF files
 ## Project Structure
 
 ```
@@ -160,6 +158,25 @@ If Grok API is unavailable, the app uses:
 - Template-based feedback generation
 
 ## Development
+
+### Real-time Internet Fetching (optional)
+
+The project includes a lightweight internet fetching helper (`scoring/internet_tools.py`) that can augment Grok prompts with realtime web content. This is optional and disabled by default.
+
+How to enable:
+
+1. Install optional dependencies:
+
+```bash
+pip install langchain beautifulsoup4
+```
+
+2. Use `GrokClient.generate_with_online_context(prompt, urls=[...])` to fetch and include short summaries from the provided URLs before calling the Grok API.
+
+Notes:
+- Network calls may increase latency. Failures are handled gracefully and will fallback to local generation.
+- Do not pass sensitive or private URLs unless you understand the privacy implications of sending them to an external API.
+
 
 ### Task Management
 

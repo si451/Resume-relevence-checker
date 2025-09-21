@@ -87,24 +87,28 @@ Job Description:
             
             # Parse JSON response
             llm_text = response["text"].strip()
-            
+
             # Try to extract JSON from the response
-            json_match = re.search(r'\{.*\}', llm_text, re.DOTALL)
+            json_match = re.search(r'\{[\s\S]*\}', llm_text)
             if json_match:
                 json_str = json_match.group()
                 skills_data = json.loads(json_str)
-                
+
                 must_have = skills_data.get("must_have", [])
                 good_to_have = skills_data.get("good_to_have", [])
-                
+                role_title = skills_data.get("role_title") or skills_data.get("title")
+                qualifications = skills_data.get("qualifications") or skills_data.get("education")
+
                 # Validate and clean skills
                 must_have = self._clean_skills_list(must_have)
                 good_to_have = self._clean_skills_list(good_to_have)
-                
+
                 return {
                     "success": True,
                     "must_have": must_have,
                     "good_to_have": good_to_have,
+                    "role_title": role_title,
+                    "qualifications": qualifications,
                     "metadata": {
                         "method": "llm",
                         "raw_response": llm_text
@@ -180,10 +184,22 @@ Job Description:
         must_have = all_skills[:5] if len(all_skills) >= 5 else all_skills[:3]
         good_to_have = all_skills[5:13] if len(all_skills) > 5 else all_skills[3:11]
         
+        # Try to heuristically detect role title
+        title_match = re.search(r'(?:looking for|we are looking for|position:|role:|we are hiring a)\s*([A-Za-z0-9\-\s]+)', jd_text, re.IGNORECASE)
+        role_title = title_match.group(1).strip() if title_match else None
+
+        # Try to detect qualifications/education lines
+        qual_matches = re.findall(r'(?:required qualifications|qualifications|requirements|education)[:\-\n]\s*([\s\S]{0,200})', jd_text, re.IGNORECASE)
+        qualifications = None
+        if qual_matches:
+            qualifications = qual_matches[0].strip()
+
         return {
             "success": True,
             "must_have": must_have,
             "good_to_have": good_to_have,
+            "role_title": role_title,
+            "qualifications": qualifications,
             "metadata": {
                 "method": "rule_based",
                 "total_found": len(all_skills)
