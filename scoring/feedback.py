@@ -8,7 +8,11 @@ from typing import Dict, List, Any, Optional
 
 # Try to import Grok client
 try:
+<<<<<<< HEAD
     from .grok_client import grok_generate, get_client
+=======
+    from .grok_client import grok_generate
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
     GROK_AVAILABLE = True
 except ImportError:
     GROK_AVAILABLE = False
@@ -16,6 +20,7 @@ except ImportError:
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+<<<<<<< HEAD
 
 def _extract_json_from_text(text: str) -> Optional[Dict[str, Any]]:
     """
@@ -56,6 +61,8 @@ def _extract_json_from_text(text: str) -> Optional[Dict[str, Any]]:
         except Exception:
             return None
 
+=======
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
 class FeedbackGenerator:
     """Generate personalized feedback for resume improvement."""
     
@@ -64,7 +71,11 @@ class FeedbackGenerator:
         if not self.use_llm:
             logger.warning("LLM not available, using template-based feedback")
     
+<<<<<<< HEAD
     def generate_one_line_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str], urls: Optional[List[str]] = None) -> str:
+=======
+    def generate_one_line_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str]) -> str:
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         """
         Generate a one-line improvement suggestion.
         
@@ -80,11 +91,19 @@ class FeedbackGenerator:
             return "Great job! Your resume covers all the required skills."
         
         if self.use_llm:
+<<<<<<< HEAD
             return self._generate_llm_feedback(jd_text, resume_text, missing_skills, urls=urls)
         else:
             return self._generate_template_feedback(missing_skills)
     
     def generate_detailed_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str], urls: Optional[List[str]] = None) -> Dict[str, Any]:
+=======
+            return self._generate_llm_feedback(jd_text, resume_text, missing_skills)
+        else:
+            return self._generate_template_feedback(missing_skills)
+    
+    def generate_detailed_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str]) -> Dict[str, Any]:
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         """
         Generate detailed feedback including summary, strengths, and weaknesses.
         
@@ -97,6 +116,7 @@ class FeedbackGenerator:
             Dictionary with detailed feedback
         """
         if self.use_llm:
+<<<<<<< HEAD
             return self._generate_llm_detailed_feedback(jd_text, resume_text, missing_skills, urls=urls)
         else:
             return self._generate_template_detailed_feedback(resume_text, missing_skills)
@@ -105,12 +125,23 @@ class FeedbackGenerator:
         """Generate feedback using LLM."""
         import re
         system_prompt = "You are an admissions coach. Provide a one-line suggestion to improve a resume given a JD and detected missing skills."
+=======
+            return self._generate_llm_detailed_feedback(jd_text, resume_text, missing_skills)
+        else:
+            return self._generate_template_detailed_feedback(resume_text, missing_skills)
+    
+    def _generate_llm_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str]) -> str:
+        """Generate feedback using LLM."""
+        system_prompt = "You are an admissions coach. Provide a one-line suggestion to improve a resume given a JD and detected missing skills."
+        
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         user_prompt = f"""JD: {jd_text[:1000]}
 
 Resume text: {resume_text[:1000]}
 
 Missing skills: {', '.join(missing_skills)}
 
+<<<<<<< HEAD
 Produce a single, action-oriented line (imperative) that a candidate can do in 1–4 weeks to improve their fit. Example: \"Add a 2-week Kaggle project demonstrating X and host code on GitHub."""
         try:
             # Use online context when URLs provided and the client supports it
@@ -153,14 +184,35 @@ Produce a single, action-oriented line (imperative) that a candidate can do in 1
                     pass
                 # Clean up non-JSON response
                 feedback = raw.replace('"', '').replace("'", "")
+=======
+Produce a single, action-oriented line (imperative) that a candidate can do in 1–4 weeks to improve their fit. Example: "Add a 2-week Kaggle project demonstrating X and host code on GitHub."""
+        
+        try:
+            response = grok_generate(
+                prompt=user_prompt,
+                system_prompt=system_prompt,
+                max_tokens=100,
+                temperature=0.2
+            )
+            
+            if response.get("ok"):
+                feedback = response["text"].strip()
+                # Clean up the response
+                feedback = feedback.replace('"', '').replace("'", "")
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
                 return feedback
             else:
                 logger.warning(f"LLM feedback generation failed: {response.get('error')}")
                 return self._generate_template_feedback(missing_skills)
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         except Exception as e:
             logger.warning(f"Error generating LLM feedback: {str(e)}")
             return self._generate_template_feedback(missing_skills)
     
+<<<<<<< HEAD
     def _generate_llm_detailed_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str], urls: Optional[List[str]] = None) -> Dict[str, Any]:
         """Generate detailed feedback using LLM."""
         import re
@@ -237,10 +289,61 @@ Example JSON:
                     "recommended_courses": [],
                     "method": "llm_error",
                     "raw": feedback_text
+=======
+    def _generate_llm_detailed_feedback(self, jd_text: str, resume_text: str, missing_skills: List[str]) -> Dict[str, Any]:
+        """Generate detailed feedback using LLM."""
+        system_prompt = "You are a resume summarizer."
+        
+        user_prompt = f"""Summarize the candidate in 2-3 short bullets focusing on relevant experience/skills for the JD.
+JD: {jd_text[:1000]}
+
+Resume: {resume_text[:1000]}
+
+Return a JSON object: {{"summary": ["...","..."], "strengths": ["..."], "weaknesses": ["..."]}}"""
+        
+        try:
+            response = grok_generate(
+                prompt=user_prompt,
+                system_prompt=system_prompt,
+                max_tokens=300,
+                temperature=0.2
+            )
+            
+            if response.get("ok"):
+                feedback_text = response["text"].strip()
+                
+                # Try to extract JSON from response
+                import re
+                json_match = re.search(r'\{.*\}', feedback_text, re.DOTALL)
+                if json_match:
+                    try:
+                        feedback_data = json.loads(json_match.group())
+                        return {
+                            "success": True,
+                            "summary": feedback_data.get("summary", []),
+                            "strengths": feedback_data.get("strengths", []),
+                            "weaknesses": feedback_data.get("weaknesses", []),
+                            "method": "llm"
+                        }
+                    except json.JSONDecodeError:
+                        pass
+                
+                # Fallback if JSON parsing fails
+                return {
+                    "success": True,
+                    "summary": [feedback_text],
+                    "strengths": ["LLM-generated feedback"],
+                    "weaknesses": missing_skills,
+                    "method": "llm_fallback"
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
                 }
             else:
                 logger.warning(f"LLM detailed feedback generation failed: {response.get('error')}")
                 return self._generate_template_detailed_feedback(resume_text, missing_skills)
+<<<<<<< HEAD
+=======
+                
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         except Exception as e:
             logger.warning(f"Error generating LLM detailed feedback: {str(e)}")
             return self._generate_template_detailed_feedback(resume_text, missing_skills)
@@ -317,7 +420,11 @@ Example JSON:
             "method": "template"
         }
     
+<<<<<<< HEAD
     def generate_batch_feedback(self, resumes_data: List[Dict[str, Any]], jd_text: str, urls: Optional[List[str]] = None) -> List[Dict[str, Any]]:
+=======
+    def generate_batch_feedback(self, resumes_data: List[Dict[str, Any]], jd_text: str) -> List[Dict[str, Any]]:
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         """
         Generate feedback for multiple resumes.
         
@@ -336,10 +443,17 @@ Example JSON:
             resume_file = resume_data.get("resume_file", "unknown")
             
             # Generate one-line feedback
+<<<<<<< HEAD
             one_line = self.generate_one_line_feedback(jd_text, resume_text, missing_skills, urls=urls)
 
             # Generate detailed feedback
             detailed = self.generate_detailed_feedback(jd_text, resume_text, missing_skills, urls=urls)
+=======
+            one_line = self.generate_one_line_feedback(jd_text, resume_text, missing_skills)
+            
+            # Generate detailed feedback
+            detailed = self.generate_detailed_feedback(jd_text, resume_text, missing_skills)
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
             
             feedback_results.append({
                 "resume_file": resume_file,
@@ -362,6 +476,7 @@ def generate_detailed_feedback(jd_text: str, resume_text: str, missing_skills: L
     generator = FeedbackGenerator(use_llm=use_llm)
     return generator.generate_detailed_feedback(jd_text, resume_text, missing_skills)
 
+<<<<<<< HEAD
 
 def format_detailed_feedback_to_text(detailed: Dict[str, Any]) -> str:
     """
@@ -558,3 +673,21 @@ def _test_report_sanitization():
 if __name__ == "__main__":
     # ...existing code...
     _test_report_sanitization()
+=======
+# Example usage
+if __name__ == "__main__":
+    # Test feedback generation
+    sample_jd = "Looking for a Python developer with machine learning experience"
+    sample_resume = "John Doe - Software Engineer with 3 years Python experience"
+    missing_skills = ["Machine Learning", "TensorFlow"]
+    
+    generator = FeedbackGenerator(use_llm=False)  # Use template for testing
+    
+    # Test one-line feedback
+    one_line = generator.generate_one_line_feedback(sample_jd, sample_resume, missing_skills)
+    print(f"One-line feedback: {one_line}")
+    
+    # Test detailed feedback
+    detailed = generator.generate_detailed_feedback(sample_jd, sample_resume, missing_skills)
+    print(f"Detailed feedback: {json.dumps(detailed, indent=2)}")
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6

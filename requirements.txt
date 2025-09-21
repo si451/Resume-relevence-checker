@@ -27,11 +27,14 @@ xlsxwriter>=3.1.0
 # chromadb>=0.4.0
 # faiss-cpu>=1.7.4
 
+<<<<<<< HEAD
 # Optional: Internet fetching and LangChain integration (install if you want realtime web fetch)
 # langchain provides RequestsWrapper and other helpers. beautifulsoup4 is used as a fallback.
 langchain>=0.0.300
 beautifulsoup4>=4.12.2
 
+=======
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
 # Development and testing
 pytest>=7.4.0
 jupyter>=1.0.0

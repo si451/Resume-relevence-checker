@@ -11,8 +11,11 @@ from scoring.parser import DocumentParser
 from scoring.skill_extractor import SkillExtractor
 from scoring.scoring import ResumeScorer
 from scoring.feedback import FeedbackGenerator
+<<<<<<< HEAD
 from scoring.feedback import FeedbackGenerator
 from scoring import internet_tools
+=======
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
 
 # Set page config
 st.set_page_config(
@@ -29,10 +32,13 @@ if 'jd_text' not in st.session_state:
     st.session_state.jd_text = ""
 if 'jd_skills' not in st.session_state:
     st.session_state.jd_skills = {"must_have": [], "good_to_have": []}
+<<<<<<< HEAD
 if 'jd_role_title' not in st.session_state:
     st.session_state.jd_role_title = None
 if 'jd_qualifications' not in st.session_state:
     st.session_state.jd_qualifications = None
+=======
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
 
 def load_tasks():
     """Load tasks from .cursor_tasks.json"""
@@ -81,6 +87,7 @@ def main():
                 height=200
             )
         
+<<<<<<< HEAD
         # Skills extraction (extract role title and qualifications too)
         if st.session_state.jd_text and st.session_state.jd_text != "PDF content will be extracted here...":
             if st.button("Extract Skills"):
@@ -96,6 +103,17 @@ def main():
                     st.success("Skills, role title, and qualifications extracted!")
                 else:
                     st.error(f"Skill extraction failed: {res.get('error')}")
+=======
+        # Skills extraction (placeholder)
+        if st.session_state.jd_text and st.session_state.jd_text != "PDF content will be extracted here...":
+            if st.button("Extract Skills"):
+                # TODO: Implement skill extraction
+                st.session_state.jd_skills = {
+                    "must_have": ["Python", "SQL", "Machine Learning", "Pandas", "Data Modeling"],
+                    "good_to_have": ["TensorFlow", "AWS", "Spark", "Tableau", "Git", "Docker", "NLP", "Communication"]
+                }
+                st.success("Skills extracted!")
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         
         # Display extracted skills
         if st.session_state.jd_skills["must_have"]:
@@ -112,6 +130,7 @@ def main():
             with st.expander("📄 Job Description Preview"):
                 preview_text = st.session_state.jd_text[:1000] + "..." if len(st.session_state.jd_text) > 1000 else st.session_state.jd_text
                 st.text_area("Job Description Text", preview_text, height=200, disabled=True, label_visibility="collapsed")
+<<<<<<< HEAD
 
         # Show detected role title and qualifications if present
         if st.session_state.jd_role_title:
@@ -119,6 +138,8 @@ def main():
         if st.session_state.jd_qualifications:
             with st.expander("Detected Qualifications / Requirements", expanded=False):
                 st.write(st.session_state.jd_qualifications)
+=======
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
         
         st.divider()
         
@@ -251,6 +272,7 @@ def main():
                         good_to_have_skills
                     )
                     
+<<<<<<< HEAD
                     # Optional: Realtime internet context
                     # Allow user to pass comma-separated URLs for online context
                     urls_input = st.sidebar.text_input("Optional: provide comma-separated URLs for online context (used to fetch course/skill info)")
@@ -281,6 +303,15 @@ def main():
                         merged_for_feedback,
                         st.session_state.jd_text,
                         urls=urls
+=======
+                    # Step 4: Generate feedback
+                    status_text.text("Generating feedback...")
+                    progress_bar.progress(80)
+                    
+                    feedback_results = feedback_generator.generate_batch_feedback(
+                        results, 
+                        st.session_state.jd_text
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
                     )
                     
                     # Combine results with feedback
@@ -322,6 +353,7 @@ def main():
     
     # Show scoring configuration used
     if st.session_state.results:
+<<<<<<< HEAD
         filtered_results = st.session_state.results
         if filtered_results:
             # Show results in cards instead of table
@@ -345,11 +377,122 @@ def main():
 
                     with col2:
                         # Color code the verdict
+=======
+        st.info(f"""
+        **📋 Scoring Configuration Used:**
+        - 🎯 **Hard Match Weight**: {hard_weight:.0%} (Keyword matching)
+        - 🧠 **Soft Match Weight**: {soft_weight:.0%} (AI semantic similarity)
+        - 📊 **Formula**: Final Score = ({hard_weight:.1f} × Hard %) + ({soft_weight:.1f} × Soft %)
+        """)
+    
+    if st.session_state.results:
+        # Show results in cards instead of table
+        for i, result in enumerate(st.session_state.results):
+            with st.container():
+                st.markdown("---")
+                
+                # Create columns for the card
+                col1, col2, col3, col4 = st.columns([3, 1, 1, 1])
+                
+                with col1:
+                    st.write(f"**📄 {result['resume_file']}**")
+                
+                with col2:
+                    # Color code the verdict
+                    verdict_color = {
+                        "High": "🟢",
+                        "Medium": "🟡", 
+                        "Low": "🔴"
+                    }
+                    st.write(f"{verdict_color.get(result['verdict'], '⚪')} **{result['verdict']}**")
+                
+                with col3:
+                    st.write(f"**{result['final_score']:.1f}%**")
+                
+                with col4:
+                    if st.button(f"View Details", key=f"details_{i}"):
+                        st.session_state.selected_resume = i
+                
+                # Show progress bars
+                col_progress1, col_progress2 = st.columns(2)
+                with col_progress1:
+                    st.progress(result['hard_pct']/100, text=f"Hard Match: {result['hard_pct']:.1f}%")
+                with col_progress2:
+                    st.progress(result['soft_pct']/100, text=f"Soft Match: {result['soft_pct']:.1f}%")
+                
+                # Show missing skills and feedback in expandable sections
+                col_skills, col_feedback = st.columns(2)
+                with col_skills:
+                    if result['missing_skills']:
+                        with st.expander("❌ Missing Skills", expanded=False):
+                            for skill in result['missing_skills']:
+                                st.write(f"• {skill}")
+                    else:
+                        st.success("✅ All required skills found!")
+                
+                with col_feedback:
+                    with st.expander("🤖 AI Feedback", expanded=False):
+                        st.write(result['grok_feedback'])
+        
+        # Detailed view for selected resume
+        if len(st.session_state.results) > 0:
+            st.markdown("---")
+            st.subheader("📋 Detailed Analysis")
+            
+            # Create tabs for better organization
+            tab1, tab2, tab3 = st.tabs(["📊 Scores & Feedback", "📄 Resume Preview", "📋 Job Description"])
+            
+            selected_resume = st.selectbox(
+                "Select a resume for detailed analysis:",
+                options=range(len(st.session_state.results)),
+                format_func=lambda x: st.session_state.results[x]["resume_file"]
+            )
+            
+            if selected_resume is not None:
+                result = st.session_state.results[selected_resume]
+                
+                with tab1:
+                    col1, col2 = st.columns(2)
+                    
+                    with col1:
+                        st.subheader("📊 Scoring Breakdown")
+                        
+                        # Show individual scores
+                        col_hard, col_soft = st.columns(2)
+                        with col_hard:
+                            st.metric("🎯 Hard Match", f"{result['hard_pct']:.1f}%", 
+                                    help="Exact keyword matches found in resume")
+                        with col_soft:
+                            st.metric("🧠 Soft Match", f"{result['soft_pct']:.1f}%", 
+                                    help="AI semantic similarity score")
+                        
+                        # Show final score with calculation
+                        st.metric("📊 Final Score", f"{result['final_score']:.1f}%", 
+                                help=f"Calculated as: ({hard_weight:.1f} × {result['hard_pct']:.1f}%) + ({soft_weight:.1f} × {result['soft_pct']:.1f}%) = {result['final_score']:.1f}%")
+                        
+                        # Visual progress bars
+                        st.subheader("📈 Score Visualization")
+                        
+                        # Hard match bar
+                        hard_progress = result['hard_pct'] / 100
+                        st.progress(hard_progress, text=f"Hard Match: {result['hard_pct']:.1f}%")
+                        
+                        # Soft match bar  
+                        soft_progress = result['soft_pct'] / 100
+                        st.progress(soft_progress, text=f"Soft Match: {result['soft_pct']:.1f}%")
+                        
+                        # Final score bar
+                        final_progress = result['final_score'] / 100
+                        st.progress(final_progress, text=f"Final Score: {result['final_score']:.1f}%")
+                        
+                        # Verdict with color coding
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
                         verdict_color = {
                             "High": "🟢",
                             "Medium": "🟡", 
                             "Low": "🔴"
                         }
+<<<<<<< HEAD
                         st.write(f"{verdict_color.get(result['verdict'], '⚪')} **{result['verdict']}**")
 
                     with col3:
@@ -501,6 +644,79 @@ def main():
             file_name=f"resume_analysis_{int(time.time())}.pdf",
             mime="application/pdf"
         )
+=======
+                        st.write(f"**Verdict:** {verdict_color.get(result['verdict'], '⚪')} {result['verdict']}")
+                        
+                        if result['missing_skills']:
+                            st.subheader("❌ Missing Skills")
+                            for skill in result['missing_skills']:
+                                st.write(f"• {skill}")
+                        else:
+                            st.success("✅ **All required skills found!**")
+                    
+                    with col2:
+                        st.subheader("🤖 AI Feedback")
+                        st.info(result['grok_feedback'])
+                        
+                        # Add detailed feedback if available
+                        if 'detailed_feedback' in result:
+                            detailed = result['detailed_feedback']
+                            if detailed.get('success'):
+                                st.subheader("📝 Detailed Analysis")
+                                
+                                if detailed.get('summary'):
+                                    st.write("**Summary:**")
+                                    for point in detailed['summary']:
+                                        st.write(f"• {point}")
+                                
+                                if detailed.get('strengths'):
+                                    st.write("**Strengths:**")
+                                    for strength in detailed['strengths']:
+                                        st.write(f"✅ {strength}")
+                                
+                                if detailed.get('weaknesses'):
+                                    st.write("**Areas for Improvement:**")
+                                    for weakness in detailed['weaknesses']:
+                                        st.write(f"⚠️ {weakness}")
+                
+                with tab2:
+                    st.subheader("📄 Resume Content Preview")
+                    if result.get('extracted_text_path') and os.path.exists(result['extracted_text_path']):
+                        with open(result['extracted_text_path'], 'r', encoding='utf-8') as f:
+                            resume_text = f.read()
+                        st.text_area("Resume Text", resume_text, height=400, disabled=True, label_visibility="collapsed")
+                    else:
+                        st.warning("Resume text not available for preview")
+                
+                with tab3:
+                    st.subheader("📋 Job Description Preview")
+                    if st.session_state.jd_text:
+                        st.text_area("Job Description Text", st.session_state.jd_text, height=400, disabled=True, label_visibility="collapsed")
+                    else:
+                        st.warning("Job description not available for preview")
+            
+        # Export buttons
+        st.markdown("---")
+        st.subheader("📥 Export Results")
+        col_export1, col_export2 = st.columns(2)
+        with col_export1:
+            csv = df.to_csv(index=False)
+            st.download_button(
+                label="📥 Download CSV",
+                data=csv,
+                file_name=f"resume_scores_{int(time.time())}.csv",
+                mime="text/csv"
+            )
+        
+        with col_export2:
+            json_data = df.to_json(orient='records', indent=2)
+            st.download_button(
+                label="📥 Download JSON",
+                data=json_data,
+                file_name=f"resume_scores_{int(time.time())}.json",
+                mime="application/json"
+            )
+>>>>>>> 39e9afbe91a2c8981771bf40da8e7b4836d8e2e6
     else:
         st.info("Upload job descriptions and resumes to see analysis results.")
 

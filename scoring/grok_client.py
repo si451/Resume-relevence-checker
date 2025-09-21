@@ -19,8 +19,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # API Configuration
-GROK_API_URL = os.getenv("GROK_API_URL") or ""
-GROK_API_KEY = os.getenv("GROK_API_KEY") or ""
+GROK_API_URL = os.getenv("GROK_API_URL")
+GROK_API_KEY = os.getenv("GROK_API_KEY")
 
 # Headers for API requests
 HEADERS = {
@@ -32,8 +32,8 @@ class GrokClient:
     """Client for interacting with Grok API."""
     
     def __init__(self, api_url: str = None, api_key: str = None):
-    self.api_url = api_url if api_url is not None else GROK_API_URL
-    self.api_key = api_key if api_key is not None else GROK_API_KEY
+        self.api_url = api_url or GROK_API_URL
+        self.api_key = api_key or GROK_API_KEY
         self.headers = {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json"
@@ -55,7 +55,7 @@ class GrokClient:
     
     def _make_request(self, endpoint: str, payload: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
         """Make API request with retry logic."""
-    url = f"{(self.api_url or '').rstrip('/')}/{endpoint.lstrip('/')}"
+        url = f"{self.api_url.rstrip('/')}/{endpoint.lstrip('/')}"
         
         # Log the request
         print(f"\n🚀 Groq API Request to {endpoint}:")

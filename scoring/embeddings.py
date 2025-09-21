@@ -47,10 +47,16 @@ class EmbeddingManager:
         if SENTENCE_TRANSFORMERS_AVAILABLE:
             try:
                 logger.info(f"Loading sentence transformer model: {self.model_name}")
-                # Set Hugging Face access token
+                # Use HF token from environment if present. Do NOT hard-code tokens here.
                 import os
-                # os.environ['HF_TOKEN'] = os.getenv('HF_TOKEN')
-                self.model = SentenceTransformer(self.model_name, use_auth_token=True)
+                hf_token = os.getenv('HF_TOKEN')
+                if hf_token:
+                    os.environ['HF_TOKEN'] = hf_token
+                    self.model = SentenceTransformer(self.model_name, use_auth_token=True)
+                else:
+                    # If no token provided, try to load without auth and let the
+                    # underlying library raise a helpful error if the model requires auth.
+                    self.model = SentenceTransformer(self.model_name)
                 logger.info("Sentence transformer model loaded successfully")
                 return
             except Exception as e:
