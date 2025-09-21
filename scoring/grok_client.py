@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 
 # API Configuration
 GROK_API_URL = os.getenv("GROK_API_URL","https://api.groq.com/openai/v1")
-GROK_API_KEY = os.getenv("GROK_API_KEY","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")
+GROK_API_KEY = os.getenv("GROK_API_KEY","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")
 
 # Headers for API requests
 HEADERS = {
